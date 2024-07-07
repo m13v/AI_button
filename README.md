@@ -1,8 +1,12 @@
-This is the [assistant-ui](https://github.com/Yonom/assistant-ui) starter project.
+# AI_button
+
+This project is something I've been missing quite a lot. How do I engage user with AI chat with less friction?
+
+So, I integrated LLM calls to auto-generate follow-up questions based on the latest conversation, displayed as clickable buttons.
 
 ## Getting Started
 
-First, add your OpenAI API key to `.env.local` file:
+First, add your OpenAI API key to `.env` file:
 
 ```
 OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
