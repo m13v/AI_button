@@ -4,6 +4,8 @@ This project is something I've been missing quite a lot. How do I engage user wi
 
 So, I integrated LLM calls to auto-generate follow-up questions based on the latest conversation, displayed as clickable buttons.
 
+![Demo](./app/demo.gif)
+
 ## Getting Started
 
 First, add your OpenAI API key to `.env` file:
