@@ -5,8 +5,7 @@ import {
   MessagePrimitive,
   ThreadPrimitive,
 } from "@assistant-ui/react";
-import type { FC } from "react";
-import React, { PropsWithChildren, type FC, useState, useEffect, useCallback } from "react";
+import React, { type FC } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,20 +17,16 @@ import {
 import { cn } from "@/lib/utils";
 import { SendHorizonalIcon } from "lucide-react";
 import { ThreadPrimitiveNotEmpty } from "./ThreadNotEmptyHook";
-import { useLastAssistantMessage } from "./LastMessageHook";
-import { generate } from './actions';
-import { readStreamableValue } from 'ai/rsc';
-
-import { UserContentPart, AssistantContentPart } from "@assistant-ui/react"; // Adjust the import path as necessary
+import AI_ThreadSuggestion from './AI_ThreadSuggestion';
+import ThreadSuggestion from './ThreadSuggestion';
 
 
-export const Thread: FC = () => {
+export const Thread: FC = () => {  {/* This is UI for ongoing chat */}
   return (
     <TooltipProvider>
       <ThreadPrimitive.Root className="bg-background h-full">
         <ThreadPrimitive.Viewport className="flex h-full flex-col items-center overflow-y-scroll scroll-smooth px-4 pt-8">
           <ThreadWelcome />
-
           <ThreadPrimitive.Messages
             components={{
               UserMessage,
@@ -39,16 +34,16 @@ export const Thread: FC = () => {
             }}
           />
           <div className="sticky bottom-0 mt-4 flex w-full max-w-2xl flex-grow flex-col items-center justify-end rounded-t-lg bg-inherit pb-4">
-          <ThreadPrimitiveNotEmpty>
-          <div className="w-full px-4 mb-4">
-            <div className="flex flex-wrap gap-4 justify-center">
-            <ThreadPrimitive.If running={false}>
-              <AI_ThreadSuggestion prompt="Create a very short goofy question to AI model as if you were a user">
-              </AI_ThreadSuggestion>
-              </ThreadPrimitive.If>
-            </div>
-          </div>
-          </ThreadPrimitiveNotEmpty>
+            <ThreadPrimitiveNotEmpty>
+              <div className="w-full px-4 mb-4">
+                <div className="flex flex-wrap gap-4 justify-center">
+                  <ThreadPrimitive.If running={false}> {/*Important to wrap Thread suggestion into if statement since the original message is streamed and we don't want to generate buttons ahead of time*/}
+                    <AI_ThreadSuggestion>
+                    </AI_ThreadSuggestion>
+                  </ThreadPrimitive.If>
+                </div>
+              </div>
+            </ThreadPrimitiveNotEmpty>
             <Composer />
           </div>
         </ThreadPrimitive.Viewport>
@@ -57,7 +52,7 @@ export const Thread: FC = () => {
   );
 };
 
-const ThreadWelcome: FC = () => {
+const ThreadWelcome: FC = () => { {/* This is WELCOME UI */}
   return (
     <div className="w-full max-w-2xl flex flex-col grow py-6 px-4">
       <ThreadPrimitive.Empty>
@@ -73,81 +68,9 @@ const ThreadWelcome: FC = () => {
             </ThreadSuggestion>
           </div>
         </div>
-
       </ThreadPrimitive.Empty>
-    </div>  
-  );
-};
-const ThreadSuggestion: FC<PropsWithChildren<{ prompt: string }>> = ({ prompt, children }) => {
-  return (
-    <ThreadPrimitive.Suggestion prompt={prompt} method="replace" autoSend asChild>
-      <Button variant="outline" className="flex-1 h-12">
-        {children}
-      </Button>
-    </ThreadPrimitive.Suggestion>
-  )
-}
-
-const AI_ThreadSuggestion: FC<PropsWithChildren<{ prompt: string }>> = ({ prompt, children }) => {
-  const lastAssistantMessage = useLastAssistantMessage();
-  const [output, setOutput] = useState<string | null>(null);
-  const [output2, setOutput2] = useState<string | null>(null);
-
-  const handleClick = useCallback(async () => {
-    const lastMessageContent = lastAssistantMessage?.content;
-    const lastMessageString = JSON.stringify(lastMessageContent);
-    console.log('LM:', lastMessageString);
-
-    const [response1, response2] = await Promise.all([
-      generate(`Generate a optimistic very very short one sentence follow up question based on this response: ${lastMessageString}`),
-      generate(`Generate a very skeptical very very short one sentence follow up question based on this response: ${lastMessageString}`)
-    ]);
-
-    let generatedOutput = '';
-    for await (const delta of readStreamableValue(response1.output)) {
-      generatedOutput += delta;
-    }
-    console.log(generatedOutput);
-    setOutput(generatedOutput);
-
-    let generatedOutput2 = '';
-    for await (const delta of readStreamableValue(response2.output)) {
-      generatedOutput2 += delta;
-    }
-    console.log(generatedOutput2);
-    setOutput2(generatedOutput2);
-  }, [lastAssistantMessage]);
-
-  useEffect(() => {
-    if (lastAssistantMessage) {
-      handleClick();
-    }
-  }, [lastAssistantMessage, handleClick]);
-
-  return (
-    <div className="flex w-full space-x-2">
-      <ThreadPrimitive.Suggestion prompt={output || prompt} method="replace" autoSend asChild>
-        <Button
-          variant="outline"
-          className="flex-1 h-auto p-2"
-          onClick={handleClick}
-          style={{ whiteSpace: 'normal', wordWrap: 'break-word' }}
-        >
-          {output || children}
-        </Button>
-      </ThreadPrimitive.Suggestion>
-      <ThreadPrimitive.Suggestion prompt={output2 || prompt} method="replace" autoSend asChild>
-        <Button
-          variant="outline"
-          className="flex-1 h-auto p-2"
-          onClick={handleClick}
-          style={{ whiteSpace: 'normal', wordWrap: 'break-word' }}
-        >
-          {output2 || children}
-        </Button>
-      </ThreadPrimitive.Suggestion>
     </div>
-);
+  );
 };
 
 const Composer: FC = () => {
