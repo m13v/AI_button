@@ -1,8 +1,6 @@
 # AI_button
 
-This project is something I've been missing quite a lot. How do I engage user with AI chat with less friction?
-
-So, I integrated LLM calls to auto-generate follow-up questions based on the latest conversation, displayed as clickable buttons.
+Welcome to AI_button! 🎉 This project is all about making AI chat super engaging with minimal friction. We've integrated LLM calls to auto-generate follow-up questions based on the latest conversation, displayed as clickable buttons. Dive in and see how easy it is to keep the conversation going! 🚀
 
 ![Demo](./app/demo.gif)
 
